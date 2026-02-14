@@ -3,7 +3,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from ..state import ResearchState
 from ..config import Config
 
-class InsightAgent:
+class KnowledgeSynthesizer:
     def __init__(self):
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,

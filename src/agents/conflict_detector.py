@@ -4,7 +4,7 @@ from ..state import ResearchState
 from ..config import Config
 import json
 
-class CriticalAnalysisAgent:
+class ConflictDetector:
     def __init__(self):
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,

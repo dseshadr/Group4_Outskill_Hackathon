@@ -14,7 +14,7 @@ except ImportError:
     HAS_TRANSFORMERS = False
     from sklearn.feature_extraction.text import TfidfVectorizer
 
-class SynthesizerAgent:
+class ClaimExtractor:
     def __init__(self):
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,

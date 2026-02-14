@@ -35,8 +35,35 @@ def format_time(seconds):
 # Sidebar
 with st.sidebar:
     st.header("Configuration")
-    model = st.selectbox("LLM Model", [Config.LLM_MODEL, "gpt-4o", "gpt-3.5-turbo"])
-    st.info(f"Using: {model}")
+    
+    # LLM Provider Selection
+    provider = st.radio("LLM Provider", ["OpenRouter", "Local (LM Studio)"])
+    
+    if provider == "Local (LM Studio)":
+        # Override Config for Local
+        Config.LLM_MODEL = Config.LOCAL_LLM_MODEL
+        Config.OPENROUTER_BASE_URL = Config.LOCAL_LLM_BASE_URL
+        Config.OPENROUTER_API_KEY = "lm-studio"
+        
+        st.info(f"Using Local LLM: {Config.OPENROUTER_BASE_URL}")
+        
+    else: # OpenRouter
+        model = st.selectbox("LLM Model", [
+            os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free"), 
+            "gpt-4o", 
+            "gpt-3.5-turbo",
+            "google/gemini-2.0-pro-exp-02-05:free"
+        ])
+        
+        # Restore Config for OpenRouter
+        Config.LLM_MODEL = model
+        Config.OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+        Config.OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+        
+        if not Config.OPENROUTER_API_KEY:
+            st.error("⚠️ OPENROUTER_API_KEY missing in environment!")
+        else:
+            st.success(f"Using OpenRouter: {model}")
     
     st.divider()
     st.header("Controls")
@@ -131,49 +158,49 @@ async def run_research(user_query):
                     # Capture Logs
                     new_logs = state_update.get("logs", [])
                     
-                    if node_name == "planner":
-                        msg = "✅ Planner: Strategy generated."
+                    if node_name == "strategist":
+                        msg = "✅ Strategist: Research plan developed."
                         full_logs.append(msg)
                         status_bar.progress(10)
                         
-                    elif node_name == "retriever":
+                    elif node_name == "gatherer":
                         docs = state_update.get("documents", [])
                         count = len(docs)
-                        msg = f"✅ Retriever: Fetched {count} documents."
+                        msg = f"✅ Gatherer: Collected {count} source documents."
                         full_logs.append(msg)
                         status_bar.progress(30)
                         
-                    elif node_name == "synthesizer":
-                        msg = f"✅ Synthesizer: Processed claims."
+                    elif node_name == "extractor":
+                        msg = f"✅ Extractor: Isolated key claims."
                         full_logs.append(msg)
                         for l in new_logs:
                             full_logs.append(f"   - {l}")
                         status_bar.progress(50)
                         
-                    elif node_name == "critical_analysis":
+                    elif node_name == "detector":
                         contras = state_update.get("contradictions", [])
-                        msg = f"✅ Analyst: Found {len(contras)} contradictions."
+                        msg = f"✅ Detector: Identified {len(contras)} conflicts."
                         full_logs.append(msg)
                         status_bar.progress(70)
                         
                         if state_update.get("top_contradiction"):
-                                full_logs.append("⚠️ Loop: Contradiction too high, researching again...")
+                                full_logs.append("⚠️ Loop: Critical conflict detected, refining search...")
 
-                    elif node_name == "debunker":
+                    elif node_name == "source_verifier":
                         flags = state_update.get("hallucination_flags", [])
-                        msg = f"✅ De-Bunker: {len(flags)} hallucinations flagged."
+                        msg = f"✅ Verifier: Flagged {len(flags)} potential hallucinations."
                         full_logs.append(msg)
                         for l in new_logs:
                             full_logs.append(f"   - {l}")
                         status_bar.progress(85)
 
-                    elif node_name == "insight":
-                        msg = "✅ Insight Agent: Synthesis complete."
+                    elif node_name == "knowledge_synthesizer":
+                        msg = "✅ Synthesizer: Integrating knowledge..."
                         full_logs.append(msg)
                         status_bar.progress(90)
 
-                    elif node_name == "editor":
-                        msg = "✅ Editor: Report generated."
+                    elif node_name == "narrative_designer":
+                        msg = "✅ Designer: Compiling final report."
                         full_logs.append(msg)
                         status_bar.progress(95)
                         accumulated_state["report"] = state_update.get("report")

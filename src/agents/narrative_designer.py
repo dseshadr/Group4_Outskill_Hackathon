@@ -5,7 +5,7 @@ from ..config import Config
 import os
 from datetime import datetime
 
-class EditorAgent:
+class NarrativeDesigner:
     def __init__(self):
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,

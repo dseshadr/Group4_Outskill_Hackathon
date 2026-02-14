@@ -5,7 +5,7 @@ from tavily import TavilyClient
 from ..state import ResearchState
 from ..config import Config
 
-class PlannerAgent:
+class ResearchStrategist:
     def __init__(self):
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,

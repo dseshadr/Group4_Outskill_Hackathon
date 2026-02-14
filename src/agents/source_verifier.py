@@ -13,7 +13,7 @@ except ImportError:
     HAS_TRANSFORMERS = False
     from sklearn.feature_extraction.text import TfidfVectorizer
 
-class DeBunkerAgent:
+class SourceVerifier:
     def __init__(self):
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,

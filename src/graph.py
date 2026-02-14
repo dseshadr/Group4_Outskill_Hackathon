@@ -1,12 +1,12 @@
 from langgraph.graph import StateGraph, END
 from .state import ResearchState
-from .agents.planner import PlannerAgent
-from .agents.retriever import RetrieverAgent
-from .agents.synthesizer import SynthesizerAgent
-from .agents.editor import EditorAgent
-from .agents.critical_analysis import CriticalAnalysisAgent
-from .agents.debunker import DeBunkerAgent
-from .agents.insight import InsightAgent
+from .agents.research_strategist import ResearchStrategist
+from .agents.information_gatherer import InformationGatherer
+from .agents.claim_extractor import ClaimExtractor
+from .agents.narrative_designer import NarrativeDesigner
+from .agents.conflict_detector import ConflictDetector
+from .agents.source_verifier import SourceVerifier
+from .agents.knowledge_synthesizer import KnowledgeSynthesizer
 from .config import Config
 
 def increment_loop(state: ResearchState) -> dict:
@@ -24,52 +24,53 @@ def check_contradiction(state):
         print(f"Contradiction found. Entering loop {loop_count + 1}")
         return "increment_loop"
     
-    print("No critical contradiction or max loops reached. Proceeding to De-Bunker.")
-    return "debunker"
+    print("No critical contradiction or max loops reached. Proceeding to Source Verifier.")
+    return "source_verifier"
 
 def create_graph():
     # Initialize agents
-    planner = PlannerAgent()
-    retriever = RetrieverAgent()
-    synthesizer = SynthesizerAgent()
-    critical_analysis = CriticalAnalysisAgent()
-    debunker = DeBunkerAgent()
-    insight = InsightAgent()
-    editor = EditorAgent()
+    strategist = ResearchStrategist()
+    gatherer = InformationGatherer()
+    extractor = ClaimExtractor()
+    detector = ConflictDetector()
+    verifier = SourceVerifier()
+    synthesizer = KnowledgeSynthesizer()
+    designer = NarrativeDesigner()
 
     # Create graph
     workflow = StateGraph(ResearchState)
 
     # Add nodes
-    workflow.add_node("planner", planner.run)
-    workflow.add_node("retriever", retriever.run)
-    workflow.add_node("synthesizer", synthesizer.run)
-    workflow.add_node("critical_analysis", critical_analysis.run)
+    workflow.add_node("strategist", strategist.run)
+    workflow.add_node("gatherer", gatherer.run)
+    workflow.add_node("extractor", extractor.run)
+    workflow.add_node("detector", detector.run)
     workflow.add_node("increment_loop", increment_loop)
-    workflow.add_node("debunker", debunker.run)
-    workflow.add_node("insight", insight.run)
-    workflow.add_node("editor", editor.run)
+    workflow.add_node("source_verifier", verifier.run)
+    workflow.add_node("knowledge_synthesizer", synthesizer.run)
+    workflow.add_node("narrative_designer", designer.run)
 
     # Define edges
-    workflow.set_entry_point("planner")
-    workflow.add_edge("planner", "retriever")
-    workflow.add_edge("retriever", "synthesizer")
-    workflow.add_edge("synthesizer", "critical_analysis")
+    # Define edges
+    workflow.set_entry_point("strategist")
+    workflow.add_edge("strategist", "gatherer")
+    workflow.add_edge("gatherer", "extractor")
+    workflow.add_edge("extractor", "detector")
     
     # Conditional logic
     workflow.add_conditional_edges(
-        "critical_analysis",
+        "detector",
         check_contradiction,
         {
             "increment_loop": "increment_loop",
-            "debunker": "debunker"
+            "source_verifier": "source_verifier"
         }
     )
     
-    workflow.add_edge("increment_loop", "planner")
-    workflow.add_edge("debunker", "insight")
-    workflow.add_edge("insight", "editor")
-    workflow.add_edge("editor", END)
+    workflow.add_edge("increment_loop", "strategist")
+    workflow.add_edge("source_verifier", "knowledge_synthesizer")
+    workflow.add_edge("knowledge_synthesizer", "narrative_designer")
+    workflow.add_edge("narrative_designer", END)
 
     # Compile
     app = workflow.compile()

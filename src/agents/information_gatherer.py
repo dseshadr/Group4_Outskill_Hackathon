@@ -3,7 +3,7 @@ from langchain_community.utilities import WikipediaAPIWrapper, ArxivAPIWrapper
 from ..state import ResearchState
 from ..config import Config
 
-class RetrieverAgent:
+class InformationGatherer:
     def __init__(self):
         self.tavily = TavilyClient(api_key=Config.TAVILY_API_KEY)
         self.wikipedia = WikipediaAPIWrapper()

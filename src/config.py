@@ -17,6 +17,10 @@ class Config:
     OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
     CONTRADICTION_THRESHOLD = float(os.getenv("CONTRADICTION_THRESHOLD", 0.7))
     MAX_SUB_QUESTIONS = 5
+    
+    # Local Config
+    LOCAL_LLM_BASE_URL = os.getenv("LOCAL_LLM_BASE_URL", "http://localhost:1233/v1")
+    LOCAL_LLM_MODEL = os.getenv("LOCAL_LLM_MODEL", "local-model")
 
     @staticmethod
     def validate():
