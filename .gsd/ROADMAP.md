@@ -14,7 +14,7 @@
 ## Phases
 
 ### Phase 1: Core System Architecture (Foundation)
-**Status**: ⬜ Not Started
+**Status**: ✅ Done
 **Objective**: Build the orchestration engine and basic agent structure.
 **Requirements**: 
 - Implement LangGraph state machine.
@@ -26,7 +26,7 @@
 - Logging infrastructure for transparency.
 
 ### Phase 2: Intelligence & Contradiction Loop (Agent Expansion)
-**Status**: ⬜ Not Started
+**Status**: ✅ Done
 **Objective**: Enhance reasoning depth and handling of complex queries.
 **Requirements**: 
 - Implement Critical Analysis Agent (Claim comparison).
@@ -35,23 +35,22 @@
 - Implement Insight Generation Agent.
 - UI Layer (Streamlit/Graphviz/Mermaid).
 
-### Phase 3: Performance & Scale
-**Status**: ⬜ Not Started
-**Objective**: Optimize for speed, cost, and reliability.
+### Phase 3: Optimizations & Tool Integration
+**Status**: ✅ Done
+**Objective**: Improve efficiency and reduce API costs.
 **Requirements**: 
-- Parallelize retrieval and processing.
-- Token optimization (compression, deduplication).
-- Observability Dashboard (Latency, Costs).
-- Failure resilience (Retries, Fallbacks).
+- Smart Looping (Query Refinement).
+- Integrate Wikipedia & Arxiv Tools.
+- Rate Limit & Cost Optimization.
 
-### Phase 4: Platform Maturity
-**Status**: ⬜ Not Started
-**Objective**: Refine UX and add platform features.
+### Phase 4: Targeted Logic Refactor (User Request)
+**Status**: ✅ Done
+**Objective**: "Narrow and Deep" architecture for maximum cost efficiency.
 **Requirements**: 
-- Research controls (Breadth/Depth, Filters).
-- Report export (PDF/MD/JSON).
-- Persistent Knowledge Base (Optional).
-- UI Polish (Dark theme, transitions).
+- Refactor Planner: 1 Tavily Search -> 5 Sub-questions.
+- Refactor Retriever: 5 Searches -> 25 results + summaries.
+- Refactor Synthesizer: Limit to Top 20 confident claims.
+- Refactor Loop Logic: Single-threaded contradiction resolution.
 
 ### Phase 5: Advanced Reasoning (Optional)
 **Status**: ⬜ Not Started

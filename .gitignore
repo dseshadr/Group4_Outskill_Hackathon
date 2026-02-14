@@ -10,10 +10,13 @@ env/
 
 # Environment Variables
 .env
+config.env
 
 # IDEs
 .vscode/
 .idea/
 
-# OS specific
-.DS_Store
+# Output
+output/
+__pycache__/
+test_imports.py
