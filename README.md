@@ -148,7 +148,18 @@ streamlit run app.py
 
 ---
 
-## 🤝 Contributing
+## � Methodology & Attribution
+
+This project follows the **Get Shit Done (GSD)** methodology, designed for transparency and efficiency in autonomous development.
+
+-   **Original Methodology**: [Get Shit Done](https://github.com/gsd-build/get-shit-done)
+-   **Adapted for Antigravity**: [GSD for Antigravity](https://github.com/toonight/get-shit-done-for-antigravity)
+
+We utilize this framework to ensure rigorous planning, state management, and empirical verification throughout the development lifecycle.
+
+---
+
+## �🤝 Contributing
 1.  Fork the repo.
 2.  Create your feature branch (`git checkout -b feature/AmazingFeature`).
 3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
