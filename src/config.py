@@ -20,7 +20,7 @@ class Config:
     # Default to a cost-effective powerful model, user can override in .env
     LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-4o") 
     OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-    CONTRADICTION_THRESHOLD = float(os.getenv("CONTRADICTION_THRESHOLD", 0.7))
+    CONTRADICTION_THRESHOLD = float(os.getenv("CONTRADICTION_THRESHOLD", 0.9))
     MAX_SUB_QUESTIONS = 5
     
     # Local Config
