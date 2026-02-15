@@ -20,7 +20,7 @@ class Config:
     
     # Local Config
     LOCAL_LLM_BASE_URL = os.getenv("LOCAL_LLM_BASE_URL", "http://localhost:1233/v1")
-    LOCAL_LLM_MODEL = os.getenv("LOCAL_LLM_MODEL", "local-model")
+    LOCAL_LLM_MODEL = os.getenv("LOCAL_LLM_MODEL", "hermes-3-llama-3.1-8b")
 
     @staticmethod
     def validate():
