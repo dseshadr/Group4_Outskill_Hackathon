@@ -34,43 +34,6 @@ def format_time(seconds):
 
 # Sidebar
 with st.sidebar:
-    st.header("Configuration")
-    
-    # LLM Provider Selection
-    provider = st.radio("LLM Provider", ["OpenRouter", "Local (LM Studio)"])
-    
-    if provider == "Local (LM Studio)":
-        # Override Config for Local
-        Config.LLM_MODEL = Config.LOCAL_LLM_MODEL
-        Config.OPENROUTER_BASE_URL = Config.LOCAL_LLM_BASE_URL
-        Config.OPENROUTER_API_KEY = "lm-studio"
-        
-        st.info(f"Using Local LLM: {Config.OPENROUTER_BASE_URL}")
-        
-    else: # OpenRouter
-        model = st.selectbox("LLM Model", [
-            os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free"), 
-            "gpt-4o", 
-            "gpt-3.5-turbo",
-            "google/gemini-2.0-pro-exp-02-05:free"
-        ])
-        
-        # Restore Config for OpenRouter
-        Config.LLM_MODEL = model
-        Config.OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-        Config.OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-        
-        if not Config.OPENROUTER_API_KEY:
-            st.error("⚠️ OPENROUTER_API_KEY missing in environment!")
-        else:
-            st.success(f"Using OpenRouter: {model}")
-    
-    st.divider()
-    st.header("Controls")
-    if st.button("🛑 Stop Research", on_click=stop_research, type="secondary"):
-        st.warning("Stopping research...")
-
-    st.divider()
     st.header("📊 Metrics")
     
     col1, col2 = st.columns(2)
@@ -96,8 +59,105 @@ with st.sidebar:
     metric_wiki.metric("📖 Wiki", "0")
     metric_arxiv.metric("📜 Arxiv", "0")
 
+    st.divider()
+    st.header("Configuration")
+    
+    with st.expander("🔑 API Keys & Settings", expanded=False):
+        st.caption("Updates are saved to config.env")
+        
+        new_openrouter_key = st.text_input("OpenRouter API Key", value=os.getenv("OPENROUTER_API_KEY", ""), type="password")
+        new_hf_token = st.text_input("Hugging Face Token", value=os.getenv("HF_TOKEN", ""), type="password")
+        new_tavily_key = st.text_input("Tavily API Key", value=os.getenv("TAVILY_API_KEY", ""), type="password")
+        new_local_llm_url = st.text_input("Local LLM URL", value=os.getenv("LOCAL_LLM_BASE_URL", "http://localhost:1233/v1"))
+        
+        if st.button("💾 Save Configuration"):
+            # Update environment variables
+            os.environ["OPENROUTER_API_KEY"] = new_openrouter_key
+            os.environ["HF_TOKEN"] = new_hf_token
+            os.environ["TAVILY_API_KEY"] = new_tavily_key
+            os.environ["LOCAL_LLM_BASE_URL"] = new_local_llm_url
+            
+            # Update Config class
+            Config.OPENROUTER_API_KEY = new_openrouter_key
+            Config.HF_TOKEN = new_hf_token
+            Config.TAVILY_API_KEY = new_tavily_key
+            Config.LOCAL_LLM_BASE_URL = new_local_llm_url
+            
+            # Write to config.env
+            env_content = f"""#API keys
+
+TAVILY_API_KEY="{new_tavily_key}"
+HF_TOKEN="{new_hf_token}"
+# Using Local LM Studio
+OPENROUTER_API_KEY="{new_openrouter_key}"
+OPENROUTER_BASE_URL="{Config.OPENROUTER_BASE_URL}"
+LLM_MODEL="{Config.LLM_MODEL}"
+
+CONTRADICTION_THRESHOLD={Config.CONTRADICTION_THRESHOLD}
+MAX_SUB_QUESTIONS={Config.MAX_SUB_QUESTIONS}
+
+# Local Specifics
+LOCAL_LLM_BASE_URL="{new_local_llm_url}"
+LOCAL_LLM_MODEL="{Config.LOCAL_LLM_MODEL}"
+"""
+            try:
+                with open("config.env", "w") as f:
+                    f.write(env_content)
+                st.success("✅ Configuration saved! Reloading...")
+                time.sleep(1)
+                st.rerun()
+            except Exception as e:
+                st.error(f"Failed to save config: {e}")
+
+    # LLM Provider Selection
+    provider = st.radio("LLM Provider", ["OpenRouter", "Local (LM Studio)"])
+    
+    if provider == "Local (LM Studio)":
+        # Override Config for Local
+        Config.LLM_MODEL = Config.LOCAL_LLM_MODEL
+        Config.OPENROUTER_BASE_URL = Config.LOCAL_LLM_BASE_URL
+        Config.OPENROUTER_API_KEY = "lm-studio"
+        
+        st.info(f"Using Local LLM: {Config.OPENROUTER_BASE_URL}")
+        
+    else: # OpenRouter
+        model = st.selectbox("LLM Model", [
+            os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free"), 
+            "gpt-4o", 
+            "gpt-3.5-turbo",
+            "google/gemini-2.0-pro-exp-02-05:free"
+        ])
+        
+        # Restore Config for OpenRouter
+        Config.LLM_MODEL = model
+        Config.OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+        Config.OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+        
+        if not Config.OPENROUTER_API_KEY:
+            st.error("⚠️ OPENROUTER_API_KEY missing!")
+        else:
+            st.success(f"Using OpenRouter: {model}")
+    
+
+
+
+
 query = st.text_input("Enter your research question:", placeholder="e.g., Is coffee good for you?")
-start_btn = st.button("Start Research", type="primary")
+
+def start_research():
+    if not query:
+        st.warning("Please enter a research question.")
+        return
+    st.session_state.is_running = True
+
+col_start, col_stop = st.columns([1,1])
+
+with col_start:
+    start_btn = st.button("Start Research", type="primary", disabled=st.session_state.is_running, on_click=start_research)
+
+with col_stop:
+    if st.session_state.is_running:
+        st.button("🛑 Stop Research", on_click=stop_research, type="secondary")
 
 # Main Content Area
 main_placeholder = st.empty()
@@ -213,9 +273,9 @@ async def run_research(user_query):
             status_bar.progress(100)
             return accumulated_state
 
-if start_btn and query:
-    main_placeholder.empty() # Clear previous results
-    st.session_state.is_running = True # Set running flag
+if st.session_state.is_running and query:
+    with main_placeholder.container():
+        st.empty() # Clear previous results
     
     with st.spinner("Researching..."):
         try:
@@ -256,7 +316,11 @@ if start_btn and query:
                     for i, c in enumerate(contras):
                         st.error(f"**Conflict:** {c.get('claim_1')} vs {c.get('claim_2')}")
                         st.write(f"**Reasoning:** {c.get('reasoning')}")
+        
+        # Rerun to reset UI state
+        st.rerun()
 
 else:
-    with main_placeholder.container():
-        st.info("Ready to research. Enter a query and click Start.")
+    if not st.session_state.is_running:
+        with main_placeholder.container():
+            st.info("Ready to research. Enter a query and click Start.")
