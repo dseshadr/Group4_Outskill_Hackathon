@@ -70,6 +70,7 @@ with st.sidebar:
         new_tavily_key = st.text_input("Tavily API Key", value=os.getenv("TAVILY_API_KEY", ""), type="password")
         new_local_llm_url = st.text_input("Local LLM URL", value=os.getenv("LOCAL_LLM_BASE_URL", "http://localhost:1233/v1"))
         new_local_llm_model = st.text_input("Local LLM Model", value=os.getenv("LOCAL_LLM_MODEL", "hermes-3-llama-3.1-8b"))
+        new_llm_model = st.text_input("OpenRouter Model", value=os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free"))
         
         if st.button("💾 Save Configuration"):
             # Update environment variables
@@ -78,6 +79,7 @@ with st.sidebar:
             os.environ["TAVILY_API_KEY"] = new_tavily_key
             os.environ["LOCAL_LLM_BASE_URL"] = new_local_llm_url
             os.environ["LOCAL_LLM_MODEL"] = new_local_llm_model
+            os.environ["LLM_MODEL"] = new_llm_model
             
             # Update Config class
             Config.OPENROUTER_API_KEY = new_openrouter_key
@@ -85,6 +87,7 @@ with st.sidebar:
             Config.TAVILY_API_KEY = new_tavily_key
             Config.LOCAL_LLM_BASE_URL = new_local_llm_url
             Config.LOCAL_LLM_MODEL = new_local_llm_model
+            Config.LLM_MODEL = new_llm_model
             
             # Write to config.env
             env_content = f"""#API keys
@@ -94,7 +97,7 @@ HF_TOKEN="{new_hf_token}"
 # Using Local LM Studio
 OPENROUTER_API_KEY="{new_openrouter_key}"
 OPENROUTER_BASE_URL="{Config.OPENROUTER_BASE_URL}"
-LLM_MODEL="{Config.LLM_MODEL}"
+LLM_MODEL="{new_llm_model}"
 
 CONTRADICTION_THRESHOLD={Config.CONTRADICTION_THRESHOLD}
 MAX_SUB_QUESTIONS={Config.MAX_SUB_QUESTIONS}
@@ -124,12 +127,7 @@ LOCAL_LLM_MODEL="{new_local_llm_model}"
         st.info(f"Using Local LLM: {Config.OPENROUTER_BASE_URL}")
         
     else: # OpenRouter
-        model = st.selectbox("LLM Model", [
-            os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free"), 
-            "gpt-4o", 
-            "gpt-3.5-turbo",
-            "google/gemini-2.0-pro-exp-02-05:free"
-        ])
+        model = os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free")
         
         # Restore Config for OpenRouter
         Config.LLM_MODEL = model
