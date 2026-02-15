@@ -32,6 +32,48 @@ def format_time(seconds):
     remaining_seconds = seconds % 60
     return f"{minutes}m {remaining_seconds}s"
 
+def save_configuration(openrouter_key, hf_token, tavily_key, local_llm_url, local_llm_model, llm_model):
+    """Saves configuration to environment variables, Config class, and config.env file."""
+    # Update environment variables
+    os.environ["OPENROUTER_API_KEY"] = openrouter_key
+    os.environ["HF_TOKEN"] = hf_token
+    os.environ["TAVILY_API_KEY"] = tavily_key
+    os.environ["LOCAL_LLM_BASE_URL"] = local_llm_url
+    os.environ["LOCAL_LLM_MODEL"] = local_llm_model
+    os.environ["LLM_MODEL"] = llm_model
+    
+    # Update Config class
+    Config.OPENROUTER_API_KEY = openrouter_key
+    Config.HF_TOKEN = hf_token
+    Config.TAVILY_API_KEY = tavily_key
+    Config.LOCAL_LLM_BASE_URL = local_llm_url
+    Config.LOCAL_LLM_MODEL = local_llm_model
+    Config.LLM_MODEL = llm_model
+    
+    # Write to config.env
+    env_content = f"""#API keys
+
+TAVILY_API_KEY="{tavily_key}"
+HF_TOKEN="{hf_token}"
+# Using Local LM Studio
+OPENROUTER_API_KEY="{openrouter_key}"
+OPENROUTER_BASE_URL="{Config.OPENROUTER_BASE_URL}"
+LLM_MODEL="{llm_model}"
+
+CONTRADICTION_THRESHOLD={Config.CONTRADICTION_THRESHOLD}
+MAX_SUB_QUESTIONS={Config.MAX_SUB_QUESTIONS}
+
+# Local Specifics
+LOCAL_LLM_BASE_URL="{local_llm_url}"
+LOCAL_LLM_MODEL="{local_llm_model}"
+"""
+    try:
+        with open("config.env", "w") as f:
+            f.write(env_content)
+        return True, "Configuration saved!"
+    except Exception as e:
+        return False, f"Failed to save config: {e}"
+
 # Sidebar
 with st.sidebar:
     st.header("📊 Metrics")
@@ -70,50 +112,24 @@ with st.sidebar:
         new_tavily_key = st.text_input("Tavily API Key", value=os.getenv("TAVILY_API_KEY", ""), type="password")
         new_local_llm_url = st.text_input("Local LLM URL", value=os.getenv("LOCAL_LLM_BASE_URL", "http://localhost:1233/v1"))
         new_local_llm_model = st.text_input("Local LLM Model", value=os.getenv("LOCAL_LLM_MODEL", "hermes-3-llama-3.1-8b"))
-        new_llm_model = st.text_input("OpenRouter Model", value=os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free"))
+        new_llm_model = st.text_input("OpenRouter Model", value=os.getenv("LLM_MODEL", "openai/gpt-4o"))
         
         if st.button("💾 Save Configuration"):
-            # Update environment variables
-            os.environ["OPENROUTER_API_KEY"] = new_openrouter_key
-            os.environ["HF_TOKEN"] = new_hf_token
-            os.environ["TAVILY_API_KEY"] = new_tavily_key
-            os.environ["LOCAL_LLM_BASE_URL"] = new_local_llm_url
-            os.environ["LOCAL_LLM_MODEL"] = new_local_llm_model
-            os.environ["LLM_MODEL"] = new_llm_model
+            success, msg = save_configuration(
+                new_openrouter_key, 
+                new_hf_token, 
+                new_tavily_key, 
+                new_local_llm_url, 
+                new_local_llm_model, 
+                new_llm_model
+            )
             
-            # Update Config class
-            Config.OPENROUTER_API_KEY = new_openrouter_key
-            Config.HF_TOKEN = new_hf_token
-            Config.TAVILY_API_KEY = new_tavily_key
-            Config.LOCAL_LLM_BASE_URL = new_local_llm_url
-            Config.LOCAL_LLM_MODEL = new_local_llm_model
-            Config.LLM_MODEL = new_llm_model
-            
-            # Write to config.env
-            env_content = f"""#API keys
-
-TAVILY_API_KEY="{new_tavily_key}"
-HF_TOKEN="{new_hf_token}"
-# Using Local LM Studio
-OPENROUTER_API_KEY="{new_openrouter_key}"
-OPENROUTER_BASE_URL="{Config.OPENROUTER_BASE_URL}"
-LLM_MODEL="{new_llm_model}"
-
-CONTRADICTION_THRESHOLD={Config.CONTRADICTION_THRESHOLD}
-MAX_SUB_QUESTIONS={Config.MAX_SUB_QUESTIONS}
-
-# Local Specifics
-LOCAL_LLM_BASE_URL="{new_local_llm_url}"
-LOCAL_LLM_MODEL="{new_local_llm_model}"
-"""
-            try:
-                with open("config.env", "w") as f:
-                    f.write(env_content)
-                st.success("✅ Configuration saved! Reloading...")
+            if success:
+                st.success(f"✅ {msg} Reloading...")
                 time.sleep(1)
                 st.rerun()
-            except Exception as e:
-                st.error(f"Failed to save config: {e}")
+            else:
+                st.error(msg)
 
     # LLM Provider Selection
     provider = st.radio("LLM Provider", ["OpenRouter", "Local (LM Studio)"])
@@ -127,7 +143,7 @@ LOCAL_LLM_MODEL="{new_local_llm_model}"
         st.info(f"Using Local LLM: {Config.OPENROUTER_BASE_URL}")
         
     else: # OpenRouter
-        model = os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free")
+        model = os.getenv("LLM_MODEL", "openai/gpt-4o")
         
         # Restore Config for OpenRouter
         Config.LLM_MODEL = model
@@ -264,6 +280,18 @@ async def run_research(user_query):
             return accumulated_state
 
 if start_btn and query:
+    # Auto-save configuration before starting
+    success, msg = save_configuration(
+        new_openrouter_key, 
+        new_hf_token, 
+        new_tavily_key, 
+        new_local_llm_url, 
+        new_local_llm_model, 
+        new_llm_model
+    )
+    if not success:
+         st.warning(f"⚠️ Could not save configuration: {msg}")
+         
     main_placeholder.empty() # Clear previous results
     st.session_state.is_running = True # Set running flag
     

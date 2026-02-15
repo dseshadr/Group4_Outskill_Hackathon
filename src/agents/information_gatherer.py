@@ -4,12 +4,26 @@ from ..state import ResearchState
 from ..config import Config
 
 class InformationGatherer:
+    """
+    Agent responsible for gathering information from various sources.
+    
+    Supports Tavily (web search), Wikipedia, and Arxiv.
+    """
     def __init__(self):
         self.tavily = TavilyClient(api_key=Config.TAVILY_API_KEY)
         self.wikipedia = WikipediaAPIWrapper()
         self.arxiv = ArxivAPIWrapper()
 
     def run(self, state: ResearchState) -> dict:
+        """
+        Executes the information gathering process.
+        
+        Args:
+            state: Current research state containing sub-questions.
+            
+        Returns:
+            Dictionary containing retrieved documents and tool usage statistics.
+        """
         print("--- RETRIEVER AGENT ---")
         
         queries_to_run = state.get("current_sub_questions", [])

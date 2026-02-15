@@ -10,11 +10,32 @@ from .agents.knowledge_synthesizer import KnowledgeSynthesizer
 from .config import Config
 
 def increment_loop(state: ResearchState) -> dict:
+    """
+    Increments the loop counter in the state.
+    
+    Args:
+        state: Current research state.
+        
+    Returns:
+        A dictionary with the updated loop_count.
+    """
     current_loop = state.get("loop_count", 0)
     print(f"--- LOOP INCREMENT ({current_loop + 1}) ---")
     return {"loop_count": current_loop + 1}
 
 def check_contradiction(state):
+    """
+    Determines the next step based on conflict detection results.
+    
+    Routes to 'increment_loop' if a critical contradiction is found and loop limit is not reached.
+    Otherwise, routes to 'source_verifier'.
+    
+    Args:
+        state: Current research state.
+        
+    Returns:
+        The name of the next node to execute.
+    """
     loop_count = state.get("loop_count", 0)
     max_loops = state.get("max_loops", 2)
     top_contradiction = state.get("top_contradiction")
@@ -28,6 +49,14 @@ def check_contradiction(state):
     return "source_verifier"
 
 def create_graph():
+    """
+    Constructs the LangGraph state graph for the research workflow.
+    
+    Initializes agents, defines nodes and edges, and sets up conditional routing.
+    
+    Returns:
+        A compiled StateGraph application.
+    """
     # Initialize agents
     strategist = ResearchStrategist()
     gatherer = InformationGatherer()

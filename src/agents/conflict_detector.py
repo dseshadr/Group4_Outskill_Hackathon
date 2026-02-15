@@ -5,7 +5,13 @@ from ..config import Config
 import json
 
 class ConflictDetector:
+    """
+    Agent responsible for detecting contradictions between extracted claims.
+    """
     def __init__(self):
+        """
+        Initializes the ConflictDetector with LLM.
+        """
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,
             temperature=0,
@@ -38,6 +44,15 @@ class ConflictDetector:
         )
 
     def run(self, state: ResearchState) -> dict:
+        """
+        Executes the conflict detection process.
+        
+        Args:
+            state: Current research state containing claims.
+            
+        Returns:
+            Dictionary containing identified contradictions and confidence scores.
+        """
         print("--- CRITICAL ANALYSIS AGENT ---")
         query = state["query"]
         claims = state.get("claims", [])

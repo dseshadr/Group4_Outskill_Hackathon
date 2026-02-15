@@ -6,7 +6,13 @@ import os
 from datetime import datetime
 
 class NarrativeDesigner:
+    """
+    Agent responsible for compiling the final research report.
+    """
     def __init__(self):
+        """
+        Initializes the NarrativeDesigner with LLM.
+        """
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,
             temperature=0.3,

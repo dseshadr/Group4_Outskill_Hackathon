@@ -15,7 +15,16 @@ except ImportError:
     from sklearn.feature_extraction.text import TfidfVectorizer
 
 class ClaimExtractor:
+    """
+    Agent responsible for extracting claims from gathered documents.
+    
+    Uses LLM to extract structured claims and performs deduplication
+    using vector embeddings or TF-IDF.
+    """
     def __init__(self):
+        """
+        Initializes the ClaimExtractor with LLM and embedding models.
+        """
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,
             temperature=0,
@@ -46,6 +55,15 @@ class ClaimExtractor:
             self.vectorizer = TfidfVectorizer(stop_words='english')
 
     def run(self, state: ResearchState) -> dict:
+        """
+        Executes the claim extraction process.
+        
+        Args:
+            state: Current research state containing documents.
+            
+        Returns:
+            Dictionary containing extracted and deduplicated claims.
+        """
         print("--- SYNTHESIZER AGENT ---")
         query = state["query"]
         documents = state.get("documents", [])

@@ -14,7 +14,17 @@ except ImportError:
     from sklearn.feature_extraction.text import TfidfVectorizer
 
 class SourceVerifier:
+    """
+    Agent responsible for verifying claims against source content.
+    
+    Uses a two-step verification process:
+    1. Fast pass using cosine similarity (embeddings or TF-IDF).
+    2. Slow pass using LLM for claims that fail the fast pass.
+    """
     def __init__(self):
+        """
+        Initializes the SourceVerifier with LLM and embedding models.
+        """
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,
             temperature=0,
@@ -46,6 +56,15 @@ class SourceVerifier:
             self.vectorizer = TfidfVectorizer(stop_words='english')
 
     def run(self, state: ResearchState) -> dict:
+        """
+        Executes the source verification process.
+        
+        Args:
+            state: Current research state containing claims and documents.
+            
+        Returns:
+            Dictionary containing hallucination flags and verification logs.
+        """
         print("--- DE-BUNKER AGENT ---")
         claims = state.get("claims", [])
         documents = state.get("documents", [])

@@ -8,6 +8,11 @@ if not load_dotenv(".env"):
 load_dotenv("config.env", override=True)
 
 class Config:
+    """
+    Configuration class for the application.
+    
+    Loads environment variables and provides static access to configuration settings.
+    """
     TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
     OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
     HF_TOKEN = os.getenv("HF_TOKEN")
@@ -24,6 +29,12 @@ class Config:
 
     @staticmethod
     def validate():
+        """
+        Validates the presence of required environment variables.
+        
+        Raises:
+            ValueError: If required API keys are missing.
+        """
         if not Config.TAVILY_API_KEY:
             raise ValueError("TAVILY_API_KEY is not set in environment variables")
         if not Config.OPENROUTER_API_KEY:

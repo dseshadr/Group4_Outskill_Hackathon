@@ -2,6 +2,27 @@ import operator
 from typing import List, TypedDict, Annotated, Optional, Any
 
 class ResearchState(TypedDict):
+    """
+    State definition for the research graph.
+    
+    Attributes:
+        query: The original research query.
+        sub_questions: Accumulated list of generated sub-questions.
+        current_sub_questions: Active sub-questions for the current iteration.
+        documents: Accumulated research documents.
+        claims: Accumulated extracted claims.
+        contradictions: List of identified contradictions.
+        top_contradiction: The most critical contradiction to resolve.
+        contradiction_confidence: Confidence score of the top contradiction.
+        loop_count: Current iteration count of the research loop.
+        max_loops: Maximum allowed iterations.
+        insights: Accumulated insights from the research.
+        hallucination_flags: List of potential hallucinated claims.
+        report: Final generated report.
+        stage: Current stage of the research process.
+        logs: Execution logs.
+        tool_usage: Usage statistics for external tools.
+    """
     query: str
     sub_questions: Annotated[List[str], operator.add]
     current_sub_questions: List[str] # Non-accumulating list for current loop

@@ -10,6 +10,11 @@ from src.graph import create_graph
 import argparse
 
 def main():
+    """
+    Main entry point for the Multi-Agent AI Deep Researcher application.
+    
+    Loads configuration, sets up the agent graph, and executes the research loop based on the provided query.
+    """
     load_dotenv()
     
     parser = argparse.ArgumentParser(description="Multi-Agent AI Deep Researcher")

@@ -4,7 +4,13 @@ from ..state import ResearchState
 from ..config import Config
 
 class KnowledgeSynthesizer:
+    """
+    Agent responsible for synthesizing research findings into high-level insights.
+    """
     def __init__(self):
+        """
+        Initializes the KnowledgeSynthesizer with LLM.
+        """
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,
             temperature=0.4,
@@ -27,6 +33,15 @@ class KnowledgeSynthesizer:
         )
 
     def run(self, state: ResearchState) -> dict:
+        """
+        Executes the knowledge synthesis process.
+        
+        Args:
+            state: Current research state containing claims and contradictions.
+            
+        Returns:
+            Dictionary containing generated insights.
+        """
         print("--- INSIGHT AGENT ---")
         query = state["query"]
         claims = state.get("claims", [])

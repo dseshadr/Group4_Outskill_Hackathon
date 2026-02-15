@@ -20,3 +20,4 @@ config.env
 output/
 __pycache__/
 test_imports.py
+test_env.py

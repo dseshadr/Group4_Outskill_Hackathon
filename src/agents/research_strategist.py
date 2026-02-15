@@ -6,7 +6,16 @@ from ..state import ResearchState
 from ..config import Config
 
 class ResearchStrategist:
+    """
+    Agent responsible for planning and refining research strategies.
+    
+    Generates sub-questions based on the initial query and context, or focused queries 
+    to resolve specific contradictions.
+    """
     def __init__(self):
+        """
+        Initializes the ResearchStrategist with LLM and Tavily client.
+        """
         self.llm = ChatOpenAI(
             model=Config.LLM_MODEL,
             temperature=0,
@@ -53,6 +62,15 @@ class ResearchStrategist:
         )
 
     def run(self, state: ResearchState) -> dict:
+        """
+        Executes the strategist logic.
+        
+        Args:
+            state: Current research state.
+            
+        Returns:
+            Dictionary containing generated sub-questions or a focused query for conflict resolution.
+        """
         print("--- PLANNER AGENT ---")
         query = state["query"]
         loop_count = state.get("loop_count", 0)
